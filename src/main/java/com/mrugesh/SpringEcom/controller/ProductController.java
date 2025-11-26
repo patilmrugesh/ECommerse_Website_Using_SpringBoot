@@ -52,4 +52,37 @@ public class ProductController {
         return new ResponseEntity<>(product.getImageData(), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/product/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateProduct(
+            @PathVariable int id,
+            @RequestPart("product") Product updatedProduct,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+        try {
+            Product saved = service.updateProduct(id, updatedProduct, imageFile);
+            return new ResponseEntity<>(saved, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/product/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable int id){
+        Product product = service.getProductById(id);
+
+        if(product!=null){
+            service.deleteProduct(id);
+            return new ResponseEntity<>("Deleted",HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/products/search")
+    public ResponseEntity<List<Product>> searchProduct(@RequestParam("name") String keyword) {
+        System.out.println("keyword : "+keyword);
+        return ResponseEntity.ok(service.searchProducts(keyword));
+    }
+
+
 }

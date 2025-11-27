@@ -16,6 +16,7 @@ import java.util.List;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173")
 
+
 public class ProductController {
 
     @Autowired
@@ -79,10 +80,11 @@ public class ProductController {
     }
 
     @GetMapping("/products/search")
-    public ResponseEntity<List<Product>> searchProduct(@RequestParam("name") String keyword) {
-        System.out.println("keyword : "+keyword);
+    public ResponseEntity<List<Product>> searchProduct(@RequestParam("keyword") String keyword) {
+        System.out.println("keyword = " + keyword);
         return ResponseEntity.ok(service.searchProducts(keyword));
     }
+
 
 
 }

@@ -20,7 +20,7 @@ public class ProductService {
 
 
     public Product getProductById(int id) {
-        return repo.findById(id).orElse(new Product());
+        return repo.findById(id).orElse(null);
     }
 
     public Product addProduct(Product product, MultipartFile image) throws IOException {
@@ -31,11 +31,30 @@ public class ProductService {
     }
 
     public Product updateProduct(int id, Product updatedProduct, MultipartFile imageFile) throws IOException {
-        updatedProduct.setImageName(imageFile.getOriginalFilename());
-        updatedProduct.setImageType(imageFile.getContentType());
-        updatedProduct.setImageData(imageFile.getBytes());
-        return repo.save(updatedProduct);
+
+        Product existing = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Update normal fields
+        existing.setName(updatedProduct.getName());
+        existing.setDescription(updatedProduct.getDescription());
+        existing.setBrand(updatedProduct.getBrand());
+        existing.setPrice(updatedProduct.getPrice());
+        existing.setCategory(updatedProduct.getCategory());
+        existing.setReleaseDate(updatedProduct.getReleaseDate());
+        existing.setStockQuantity(updatedProduct.getStockQuantity());
+        existing.setProductAvailable(updatedProduct.getProductAvailable());
+
+        // Update image ONLY if new image is uploaded
+        if (imageFile != null && !imageFile.isEmpty()) {
+            existing.setImageName(imageFile.getOriginalFilename());
+            existing.setImageType(imageFile.getContentType());
+            existing.setImageData(imageFile.getBytes());
+        }
+
+        return repo.save(existing);
     }
+
 
     public void deleteProduct(int id) {
         repo.deleteById(id);
